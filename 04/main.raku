@@ -10,7 +10,7 @@ class RPA {
     method n($/)   { make +$/ }
 }
 
-my @pairs = lines.map({ RP.parse($_, :actions(RPA)).made });
+my @pairs = lines.map: { RP.parse($_, :actions(RPA)).made };
 
 say sum gather for @pairs -> ($r1, $r2) {
     take 1 if $r1 ~~ $r2 or $r2 ~~ $r1;
