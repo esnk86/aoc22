@@ -12,14 +12,9 @@ grammar Stack {
 class Stack-Actions {
     method TOP($/) {
         my @spaces = $<space>.map(*.made).List;
-
-        for 0 .. @spaces.end {
-            if my $space = @spaces[$_] {
-                @stacks[$_].unshift: $space;
-            }
-        }
+        @spaces[$_] and @stacks[$_].unshift: @spaces[$_]
+            for 0 .. @spaces.end;
     }
-
     method space($/) { make $<crate>.made }
     method crate($/) { make $/.comb[1] }
 }
