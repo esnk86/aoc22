@@ -28,23 +28,18 @@ class Move-Actions {
     method TOP($/) {
         my ($count, $from, $to) = $<n>.map(+*).List;
         given $problem {
-            move1($count, $from, $to) when 1;
-            move2($count, $from, $to) when 2;
+            move($count, $from, $to, :r) when 1;
+            move($count, $from, $to) when 2;
         }
     }
 }
 
-# Move $count crates with the CrateMover 9000.
-sub move1($count, $from, $to) {
-    @stacks[$to - 1].push: @stacks[$from - 1].pop
-        for 1 .. $count;
-}
-
-# Move $count crates with the CrateMover 9001.
-sub move2($count, $from, $to) {
-    my $moved = @stacks[$from - 1];
-    @stacks[$to - 1].push: $_
-        for splice($moved, $moved.elems - $count, $count);
+sub move($count, $from, $to, :$r) {
+    my $src = @stacks[$from.pred];
+    my $dst = @stacks[$to.pred];
+    my $load = splice($src, $src.elems - $count, $count);
+    @$load.=reverse if $r;
+    $dst.push: |$load;
 }
 
 sub process($grammar, $actions) {
