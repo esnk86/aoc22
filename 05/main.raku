@@ -34,11 +34,13 @@ class Move-Actions {
     }
 }
 
+# Move $count crates with the CrateMover 9000.
 sub move1($count, $from, $to) {
     @stacks[$to - 1].push: @stacks[$from - 1].pop
         for 1 .. $count;
 }
 
+# Move $count crates with the CrateMover 9001.
 sub move2($count, $from, $to) {
     my $moved = @stacks[$from - 1];
     @stacks[$to - 1].push: $_
