@@ -27,19 +27,12 @@ grammar Move {
 class Move-Actions {
     method TOP($/) {
         my ($count, $from, $to) = $<n>.map(+*).List;
-        given $problem {
-            move($count, $from, $to, :r) when 1;
-            move($count, $from, $to) when 2;
-        }
+        my $src = @stacks[$from.pred];
+        my $dst = @stacks[$to.pred];
+        my $load = splice($src, $src.elems - $count, $count);
+        @$load.=reverse if $problem == 1;
+        $dst.push: |$load;
     }
-}
-
-sub move($count, $from, $to, :$r) {
-    my $src = @stacks[$from.pred];
-    my $dst = @stacks[$to.pred];
-    my $load = splice($src, $src.elems - $count, $count);
-    @$load.=reverse if $r;
-    $dst.push: |$load;
 }
 
 sub process($grammar, $actions) {
