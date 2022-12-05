@@ -30,7 +30,7 @@ class Move-Actions {
         my $src = @stacks[$from.pred];
         my $dst = @stacks[$to.pred];
         my $load = splice($src, $src.elems - $count, $count);
-        @$load.=reverse if $problem == 1;
+        $load.=reverse if $problem == 1;
         $dst.push: |$load;
     }
 }
