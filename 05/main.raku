@@ -12,7 +12,7 @@ grammar Stack {
 class Stack-Actions {
     method TOP($/) {
         my @spaces = $<space>.map(*.made).List;
-        @stacks[$_].push: @spaces[$_] for 0 .. @spaces.end;
+        @stacks[$_].unshift: @spaces[$_] for 0 .. @spaces.end;
     }
     method space($/) { make $<crate>.made // $<empty>.made }
     method crate($/) { make $/.comb[1] }
@@ -56,7 +56,7 @@ sub MAIN($pn where $pn (elem) <1 2>) {
     $problem = $pn;
     @lines = $*IN.lines;
     process Stack, Stack-Actions;
-    @$_.=grep(*.defined).=reverse for @stacks;
+    @$_.=grep(*.defined) for @stacks;
     process Move, Move-Actions;
     print @$_[* - 1] for @stacks;
     print "\n";
