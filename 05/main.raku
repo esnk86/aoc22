@@ -58,6 +58,6 @@ sub MAIN($pn where $pn (elem) <1 2>) {
     @lines = $*IN.lines;
     process Stack, Stack-Actions;
     process Move, Move-Actions;
-    print @$_[* - 1] for @stacks;
+    .tail.print for @stacks;
     print "\n";
 }
