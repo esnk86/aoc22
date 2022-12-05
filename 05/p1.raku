@@ -2,20 +2,20 @@ my @lines;
 my @stacks;
 
 grammar Stack {
-    token TOP   { <place>+ % ' ' }
-    token place { <crate> | <blank> }
+    token TOP   { <space>+ % ' ' }
+    token space { <crate> | <empty> }
     token crate { '[' <[A..Z]> ']' }
-    token blank { ' ' ** 3 }
+    token empty { ' ' ** 3 }
 }
 
 grammar Stack-Actions {
     method TOP($/) {
-        my @places = $<place>.map(*.made).List;
-        @stacks[$_].push: @places[$_] for 0 .. @places.end;
+        my @spaces = $<space>.map(*.made).List;
+        @stacks[$_].push: @spaces[$_] for 0 .. @spaces.end;
     }
-    method place($/) { make $<crate>.made // $<blank>.made }
+    method space($/) { make $<crate>.made // $<empty>.made }
     method crate($/) { make $/.comb[1] }
-    method blank($/) { Nil }
+    method empty($/) { Nil }
 }
 
 grammar Move {
