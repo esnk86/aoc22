@@ -49,8 +49,7 @@ sub move2($count, $from, $to) {
 
 sub process($grammar, $actions) {
     for @lines {
-        my $ast = $grammar.parse: $_, :$actions;
-        $ast.made if $ast.defined;
+        .defined and .made with $grammar.parse: $_, :$actions;
     }
 }
 
