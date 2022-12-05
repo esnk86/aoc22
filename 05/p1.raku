@@ -8,7 +8,7 @@ grammar Stack {
     token empty { ' ' ** 3 }
 }
 
-grammar Stack-Actions {
+class Stack-Actions {
     method TOP($/) {
         my @spaces = $<space>.map(*.made).List;
         @stacks[$_].push: @spaces[$_] for 0 .. @spaces.end;
