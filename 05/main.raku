@@ -16,7 +16,7 @@ class Stack-Actions {
     }
     method space($/) { make $<crate>.made // $<empty>.made }
     method crate($/) { make $/.comb[1] }
-    method empty($/) { Nil }
+    method empty($/) { '' }
 }
 
 grammar Move {
@@ -56,7 +56,7 @@ sub MAIN($pn where $pn (elem) <1 2>) {
     $problem = $pn;
     @lines = $*IN.lines;
     process Stack, Stack-Actions;
-    @$_.=grep(*.defined) for @stacks;
+    @$_.=grep(*.so) for @stacks;
     process Move, Move-Actions;
     print @$_[* - 1] for @stacks;
     print "\n";
