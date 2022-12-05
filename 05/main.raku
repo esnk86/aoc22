@@ -1,3 +1,4 @@
+my $problem;
 my @lines;
 my @stacks;
 
@@ -26,9 +27,22 @@ grammar Move {
 class Move-Actions {
     method TOP($/) {
         my ($count, $from, $to) = $<n>.map(+*).List;
-        @stacks[$to - 1].push: @stacks[$from - 1].pop
-            for 1 .. $count;
+        given $problem {
+            move1($count, $from, $to) when 1;
+            move2($count, $from, $to) when 2;
+        }
     }
+}
+
+sub move1($count, $from, $to) {
+    @stacks[$to - 1].push: @stacks[$from - 1].pop
+        for 1 .. $count;
+}
+
+sub move2($count, $from, $to) {
+    my $moved = @stacks[$from - 1];
+    @stacks[$to - 1].push: $_
+        for splice($moved, $moved.elems - $count, $count);
 }
 
 sub process($grammar, $actions) {
@@ -38,9 +52,12 @@ sub process($grammar, $actions) {
     }
 }
 
-@lines = lines;
-process Stack, Stack-Actions;
-@$_.=grep(*.defined).=reverse for @stacks;
-process Move, Move-Actions;
-print @$_[* - 1] for @stacks;
-print "\n";
+sub MAIN($pn where $pn (elem) <1 2>) {
+    $problem = $pn;
+    @lines = $*IN.lines;
+    process Stack, Stack-Actions;
+    @$_.=grep(*.defined).=reverse for @stacks;
+    process Move, Move-Actions;
+    print @$_[* - 1] for @stacks;
+    print "\n";
+}
