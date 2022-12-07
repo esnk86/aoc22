@@ -51,16 +51,25 @@ sub handle-output($line) {
     }
 }
 
-sub add-subdir-sizes() {
-    for %sizes.keys -> $this {
-        for %sizes.keys -> $that {
-            if $this ne $that and $that ~~ /^$this/ {
-                %sizes{$this} += %sizes{$that};
-            }
+sub get-total-size($path) {
+    my $total = %sizes{$path};
+
+    for %sizes.keys {
+        if $_ ne $path and /^$path/ {
+            $total += %sizes{$_};
         }
     }
+
+    $total
 }
 
 handle-input($_) or handle-output($_) for lines;
-add-subdir-sizes;
-say %sizes.values.grep(* < 100_000).sum;
+say %sizes.keys.map(&get-total-size).grep(* < 100_000).sum;
+
+my $used = get-total-size '/';
+my $unused = 70_000_000 - $used;
+
+say min gather for %sizes.keys -> $path {
+    my $total = get-total-size $path;
+    take $total if $unused + $total >= 30_000_000;
+}
