@@ -52,28 +52,11 @@ sub handle-output($line) {
 }
 
 sub get-total-size($path) {
-    my $total = %dirs{$path};
-
-    for %dirs.keys {
-        if $_ ne $path and /^$path/ {
-            $total += %dirs{$_};
-        }
-    }
-
-    $total
+    %dirs{$path} + %dirs.keys.grep(/^$path.+/).map({ %dirs{$_} }).sum
 }
 
 handle-input($_) or handle-output($_) for lines;
+my $unused = 70_000_000 - get-total-size '/';
 
 say %dirs.keys.map(&get-total-size).grep(* < 100_000).sum;
-
-my $used = get-total-size '/';
-my $unused = 70_000_000 - $used;
-
-for %dirs.keys {
-    my $total = get-total-size $_;
-    if $unused + $total >= 30_000_000 {
-        say $total;
-        last;
-    }
-}
+say %dirs.keys.map(&get-total-size).sort.first: * + $unused >= 30_000_000;
