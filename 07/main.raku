@@ -30,7 +30,7 @@ class LS-out-Actions {
     method size($/) { make $/ eq 'dir' ?? 0 !! +$/ }
 }
 
-my %sizes;
+my %dirs;
 my $cwd;
 
 sub handle-input($line) {
@@ -47,16 +47,16 @@ sub handle-input($line) {
 
 sub handle-output($line) {
     if my $size = LS-out.parse: $line, :actions(LS-out-Actions) {
-        %sizes{$cwd} += $size.made;
+        %dirs{$cwd} += $size.made;
     }
 }
 
 sub get-total-size($path) {
-    my $total = %sizes{$path};
+    my $total = %dirs{$path};
 
-    for %sizes.keys {
+    for %dirs.keys {
         if $_ ne $path and /^$path/ {
-            $total += %sizes{$_};
+            $total += %dirs{$_};
         }
     }
 
@@ -64,12 +64,12 @@ sub get-total-size($path) {
 }
 
 handle-input($_) or handle-output($_) for lines;
-say %sizes.keys.map(&get-total-size).grep(* < 100_000).sum;
+say %dirs.keys.map(&get-total-size).grep(* < 100_000).sum;
 
 my $used = get-total-size '/';
 my $unused = 70_000_000 - $used;
 
-say min gather for %sizes.keys -> $path {
+say min gather for %dirs.keys -> $path {
     my $total = get-total-size $path;
     take $total if $unused + $total >= 30_000_000;
 }
