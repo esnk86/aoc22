@@ -64,6 +64,7 @@ sub get-total-size($path) {
 }
 
 handle-input($_) or handle-output($_) for lines;
+
 say %dirs.keys.map(&get-total-size).grep(* < 100_000).sum;
 
 my $used = get-total-size '/';
