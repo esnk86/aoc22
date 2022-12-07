@@ -70,7 +70,10 @@ say %dirs.keys.map(&get-total-size).grep(* < 100_000).sum;
 my $used = get-total-size '/';
 my $unused = 70_000_000 - $used;
 
-say min gather for %dirs.keys -> $path {
-    my $total = get-total-size $path;
-    take $total if $unused + $total >= 30_000_000;
+for %dirs.keys {
+    my $total = get-total-size $_;
+    if $unused + $total >= 30_000_000 {
+        say $total;
+        last;
+    }
 }
