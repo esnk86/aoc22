@@ -6,11 +6,8 @@ sub left($x, $y)  { @heights[$y][0..$x.pred] }
 sub right($x, $y) { @heights[$y][$x.succ..*] }
 
 sub is-visible($x, $y) {
-    my @directions = &up, &down, &left, &right;
-
-    [||] gather for @directions {
-        take @heights[$y][$x] > .($x, $y).all;
-    }
+    [||] gather take @heights[$y][$x] > .($x, $y).all
+        for &up, &down, &left, &right
 }
 
 sub scenic-score($x, $y) {
@@ -26,9 +23,7 @@ sub scenic-score($x, $y) {
 
 say sum gather for 0 .. @heights.end -> $y {
     for 0 .. @heights[$y].end -> $x {
-        if is-visible($x, $y) {
-            take 1;
-        }
+        take 1 if is-visible($x, $y);
     }
 }
 
