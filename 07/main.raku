@@ -12,7 +12,7 @@ grammar LS-out {
 }
 
 grammar Shell {
-    rule TOP      { <prompt> <command> <arg>? }
+    rule  TOP     { <prompt> <command> <arg>? }
     token prompt  { '$' }
     token command { [cd | ls] }
     token arg     { \S+ }
