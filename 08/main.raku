@@ -11,7 +11,7 @@ sub is-visible($x, $y) {
 }
 
 sub scenic-score($x, $y) {
-    my @directions = &reverse o &up, &down, &reverse o &left, &right;
+    my @directions = &reverse ∘ &up, &down, &reverse ∘ &left, &right;
 
     [*] gather for @directions {
         take [+] gather for .($x, $y) {
