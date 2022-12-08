@@ -30,33 +30,23 @@ class LS-out-Actions {
     method size($/) { make $/ eq 'dir' ?? 0 !! +$/ }
 }
 
-my %dirs;
-my $cwd;
+my (%dirs, $cwd);
 
 sub handle-input($line) {
-    my $input = Shell.parse($line);
-    return False unless defined $input;
-
-    if $input<command> eq 'cd' {
-        my $arg = CD-arg.parse: $input<arg>, :actions(CD-arg-Actions);
-        $cwd = $arg.made.($cwd);
-    }
-
+    my $input = Shell.parse($line) // return False;
+    .defined and $cwd = .made.($cwd) with CD-arg.parse: $input<arg> // '', actions => CD-arg-Actions;
     return True;
 }
 
 sub handle-output($line) {
-    if my $size = LS-out.parse: $line, :actions(LS-out-Actions) {
-        %dirs{$cwd} += $size.made;
-    }
+    .defined and %dirs{$cwd} += .made with LS-out.parse: $line, actions => LS-out-Actions;
 }
 
 sub get-total-size($path) {
     %dirs{$path} + %dirs.keys.grep(/^$path.+/).map({ %dirs{$_} }).sum
 }
 
-handle-input($_) or handle-output($_) for lines;
+handle-input $_ or handle-output $_ for lines;
 my $unused = 70_000_000 - get-total-size '/';
-
 say %dirs.keys.map(&get-total-size).grep(* < 100_000).sum;
 say %dirs.keys.map(&get-total-size).sort.first: * + $unused >= 30_000_000;
