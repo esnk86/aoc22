@@ -14,13 +14,12 @@ sub is-visible($x, $y) {
 }
 
 sub scenic-score($x, $y) {
-    my $height = @heights[$y][$x];
     my @directions = &reverse o &up, &down, &reverse o &left, &right;
 
     [*] gather for @directions {
         take [+] gather for .($x, $y) {
             take 1;
-            last if $_ >= $height;
+            last if $_ >= @heights[$y][$x];
         }
     }
 }
