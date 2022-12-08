@@ -1,5 +1,4 @@
 my @heights = lines.map(*.comb.map(+*).Array).Array;
-my $visible = 0;
 
 sub is-visible($x, $y) {
     my $height = @heights[$y][$x];
@@ -10,12 +9,10 @@ sub is-visible($x, $y) {
     False;
 }
 
-for 0 .. @heights.end -> $y {
+say sum gather for 0 .. @heights.end -> $y {
     for 0 .. @heights[$y].end -> $x {
         if is-visible($x, $y) {
-            $visible++;
+            take 1;
         }
     }
 }
-
-say $visible;
