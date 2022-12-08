@@ -6,19 +6,19 @@ sub left($x, $y)  { @heights[$y][0..$x.pred] }
 sub right($x, $y) { @heights[$y][$x.succ..*] }
 
 sub is-visible($x, $y) {
-    my @directions = up($x, $y), down($x, $y), left($x, $y), right($x, $y);
+    my @directions = &up, &down, &left, &right;
 
     [||] gather for @directions {
-        take @heights[$y][$x] > .all;
+        take @heights[$y][$x] > .($x, $y).all;
     }
 }
 
 sub scenic-score($x, $y) {
     my $height = @heights[$y][$x];
-    my @directions = up($x, $y).reverse, down($x, $y), left($x, $y).reverse, right($x, $y);
+    my @directions = &reverse o &up, &down, &reverse o &left, &right;
 
     [*] gather for @directions {
-        take [+] gather for @$_ {
+        take [+] gather for .($x, $y) {
             take 1;
             last if $_ >= $height;
         }
