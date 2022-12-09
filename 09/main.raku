@@ -20,7 +20,6 @@ class Rope {
             $!h.y -= $1 when 'D';
             $!h.x -= $1 when 'L';
             $!h.x += $1 when 'R';
-
         }
     }
 
