@@ -4,42 +4,51 @@ class Point {
 }
 
 class Rope {
-    has $!h = Point.new(:0x, :0y);
-    has $!t = Point.new(:0x, :0y);
-    has %!v = (0 => 0) => 1;
+    has $.count is required;
+    has @!knots = gather take Point.new: :0x, :0y for 1 .. $!count;
+    has %!visited = (0 => 0) => 1;
 
     method parse($_) {
         self!update-head: $_;
-        self!update-tail;
     }
 
     method !update-head($_) {
         /(<[UDLR]>) <.ws> (\d+)/;
-        given $0 {
-            $!h.y += $1 when 'U';
-            $!h.y -= $1 when 'D';
-            $!h.x -= $1 when 'L';
-            $!h.x += $1 when 'R';
+        for 1 .. $1 {
+            given $0 {
+                @!knots[0].y++ when 'U';
+                @!knots[0].y-- when 'D';
+                @!knots[0].x-- when 'L';
+                @!knots[0].x++ when 'R';
+            }
+            self!update-tails;
         }
     }
 
-    method !update-tail() {
-        until self!touching {
-            $!t.x += Int($!h.x <=> $!t.x);
-            $!t.y += Int($!h.y <=> $!t.y);
-            %!v{$!t.x => $!t.y} = 1;
+    method !update-tails() {
+        for 1 .. @!knots.end {
+            my ($p1, $p2) = @!knots[$_ - 1], @!knots[$_];
+            until self!touching($p1, $p2) {
+                $p2.x += Int($p1.x <=> $p2.x);
+                $p2.y += Int($p1.y <=> $p2.y);
+                %!visited{.x => .y} = 1 with @!knots.tail;
+            }
         }
     }
 
-    method !touching() {
-        abs($!h.x - $!t.x) <= 1 && abs($!h.y - $!t.y) <= 1
+    method !touching($p1, $p2) {
+        abs($p1.x - $p2.x) <= 1 && abs($p1.y - $p2.y) <= 1
     }
 
-    method answer1() {
-        %!v.elems
+    method answer() {
+        %!visited.elems
     }
 }
 
-my $rope = Rope.new;
-$rope.parse: $_ for lines;
-say $rope.answer1;
+my @lines = lines;
+
+for 2, 10 -> $count {
+    my $rope = Rope.new: :$count;
+    $rope.parse: $_ for @lines;
+    say $rope.answer;
+}
