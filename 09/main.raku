@@ -26,12 +26,12 @@ class Rope {
     }
 
     method !update-tails() {
-        for 1 .. @!knots.end {
-            my ($p1, $p2) = @!knots[$_ - 1], @!knots[$_];
-            until self!touching($p1, $p2) {
-                $p2.x += Int($p1.x <=> $p2.x);
-                $p2.y += Int($p1.y <=> $p2.y);
-                %!visited{.x => .y} = 1 with @!knots.tail;
+        for @!knots.kv -> $i, $this {
+            my $prev = @!knots[$i.pred];
+            until self!touching($this, $prev) {
+                $this.x += Int($prev.x <=> $this.x);
+                $this.y += Int($prev.y <=> $this.y);
+                %!visited{this.x => this.y} if $i == @!knots.end;
             }
         }
     }
