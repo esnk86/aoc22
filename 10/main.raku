@@ -3,9 +3,7 @@ my ($x, $y, $c) = 1, -1, 1;
 
 sub update() {
     my $pos = ($c - 1) % 40 or $y++;
-    if $pos == $x-1|$x|$x+1 {
-        @screen[$y][$pos] = '#';
-    }
+    @screen[$y][$pos] = '#' if $pos == $x-1|$x|$x+1;
     my $s = ($c - 20) %% 40 ?? $x !! 0;
     return $s * $c++;
 }
