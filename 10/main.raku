@@ -1,4 +1,4 @@
-my @screen = [['.'] xx 40] xx 6;
+my @screen = [[' '] xx 40] xx 6;
 my ($x, $y, $c) = 1, -1, 1;
 
 sub update() {
