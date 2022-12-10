@@ -20,5 +20,6 @@ class P2 does Input-Actions {
 }
 
 my @lines = lines;
-@lines.map({ Input.parse($_, :actions(P1)).made }).sum.say;
-@lines.map({ Input.parse($_, :actions(P2)).made }).sum.say;
+for P1, P2 -> $actions {
+    @lines.map({ Input.parse($_, :$actions).made }).sum.say;
+}
