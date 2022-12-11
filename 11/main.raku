@@ -3,7 +3,6 @@ my @monkeys;
 class Monkey {
     has @.items;
     has &.operation;
-    has $.operand;
     has &.test;
     has @.friends;
     has $.business = 0;
@@ -49,7 +48,7 @@ class Record-Actions {
             !! { $<operator>.made.($_, $operand) }
         my &test = { $_ %% $<factor> }
         my @friends = $<friend>.map(+*).reverse.List;
-        make Monkey.new(:@items, :&operation, :$operand, :&test, :@friends);
+        make Monkey.new(:@items, :&operation, :&test, :@friends);
     }
 
     method operator($/) {
