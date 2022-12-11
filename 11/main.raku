@@ -73,7 +73,7 @@ sub MAIN($pn where $pn (elem) <1 2>) {
     $problem = +$pn;
     my $rounds = $problem == 1 ?? 20 !! 10_000;
 
-    my @records = lines.grep(*.chars > 0).rotor(6).map(*.trim.join(' '));
+    my @records = lines.grep(*.chars > 0).map(*.trim).rotor(6).map(*.join(' '));
     @monkeys.push: Record.parse($_, actions => Record-Actions).made for @records;
     $lcm = [lcm] @monkeys.map(*.test);
 
