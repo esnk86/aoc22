@@ -52,19 +52,18 @@ grammar Record {
 class Record-Actions {
     method TOP($/) {
         my @items = $<level>.map(+*).List;
-        my $operand = ~$<operand>;
-        my &operation = $operand eq 'old'
+        my &operation = $<operand> eq 'old'
             ?? { $<operator>.made.($_, $_) }
-            !! { $<operator>.made.($_, $operand) }
+            !! { $<operator>.made.($_, $<operand>) }
         my $test = +$<test>;
         my @friends = $<friend>.map(+*).reverse.List;
         make Monkey.new(:@items, :&operation, :$test, :@friends);
     }
 
     method operator($/) {
-        given ~$/ {
-            make { $^a + $^b } when '+';
-            make { $^a * $^b } when '*';
+        given $/ {
+            make &[+] when '+';
+            make &[*] when '*';
         }
     }
 }
