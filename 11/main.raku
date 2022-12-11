@@ -1,9 +1,11 @@
+my $problem;
 my @monkeys;
+my $lcm;
 
 class Monkey {
     has @.items;
     has &.operation;
-    has &.test;
+    has $.test;
     has @.friends;
     has $.business = 0;
 
@@ -11,14 +13,23 @@ class Monkey {
         while @!items {
             my $item = @!items.shift;
             $item = &!operation($item);
-            $item = floor($item / 3);
-            self.throw: $item, @!friends[Int(&!test($item))];
+            $item = self!manage-worry: $item;
+            self!throw: $item;
             $!business++;
         }
     }
 
-    method throw($item, $i) {
-        @monkeys[$i].items.push: $item;
+    method !manage-worry($item) {
+        if $problem == 1 {
+            return floor($item / 3);
+        } else {
+            return $item % $lcm;
+        }
+    }
+
+    method !throw($item) {
+        my $friend = @!friends[Int($item %% $!test)];
+        @monkeys[$friend].items.push: $item;
     }
 }
 
@@ -27,13 +38,13 @@ grammar Record {
         Monkey \d+ ':'
         Starting items ':' <level>* % ', '
         Operation ':' new '=' old <operator> <operand>
-        Test ':' divisible by <factor>
+        Test ':' divisible by <test>
         If true ':' throw to monkey <friend>
         If false ':' throw to monkey <friend>
         .*
     }
     token level    { \d+ }
-    token factor   { \d+ }
+    token test     { \d+ }
     token operator { <[+*]> }
     token operand  { old | \d+ }
     token friend   { \d+ }
@@ -46,9 +57,9 @@ class Record-Actions {
         my &operation = $operand eq 'old'
             ?? { $<operator>.made.($_, $_) }
             !! { $<operator>.made.($_, $operand) }
-        my &test = { $_ %% $<factor> }
+        my $test = +$<test>;
         my @friends = $<friend>.map(+*).reverse.List;
-        make Monkey.new(:@items, :&operation, :&test, :@friends);
+        make Monkey.new(:@items, :&operation, :$test, :@friends);
     }
 
     method operator($/) {
@@ -59,13 +70,19 @@ class Record-Actions {
     }
 }
 
-my @records = lines.grep(*.chars > 0).map(*.trim).rotor(6).map(*.join(' '));
-@monkeys.push: Record.parse($_, actions => Record-Actions).made for @records;
+sub MAIN($pn where $pn (elem) <1 2>) {
+    $problem = +$pn;
+    my $rounds = $problem == 1 ?? 20 !! 10_000;
 
-for 1 .. 20 {
-    for @monkeys {
-        .turn;
+    my @records = lines.grep(*.chars > 0).map(*.trim).rotor(6).map(*.join(' '));
+    @monkeys.push: Record.parse($_, actions => Record-Actions).made for @records;
+    $lcm = [lcm] @monkeys.map(*.test);
+
+    for 1 .. $rounds {
+        for @monkeys {
+            .turn;
+        }
     }
-}
 
-say [*] @monkeys.map(*.business).sort.tail(2);
+    say [*] @monkeys.map(*.business).sort.tail(2);
+}
