@@ -1,5 +1,6 @@
 my @paths;
 my @grid;
+my @queue;
 my %hist;
 my @dirs = (-1, 0), (1, 0), (0, -1), (0, 1);
 my $alpha = ('a'..'z').join;
@@ -27,12 +28,12 @@ sub options($x, $y, $steps) {
         .List;
 }
 
-sub find-paths($x is copy, $y is copy) {
+sub find-paths() {
     my $steps;
-    my @queue;
+    my $x;
+    my $y;
 
-    @queue.push: ($x, $y, 0);
-    %hist{$x}{$y} = 1;
+    %hist{.[0]}{.[1]} = 1 for @queue;
 
     while @queue {
         ($x, $y, $steps) = @queue.shift;
@@ -47,15 +48,21 @@ sub find-paths($x is copy, $y is copy) {
     }
 }
 
-@grid = lines.map(*.comb.List).List;
+sub MAIN($problem where $problem (elem) <1 2>) {
+    @grid = lines.map(*.comb.List).List;
 
-for @grid.keys -> $y {
-    for @grid[$y].keys -> $x {
-        if @grid[$y][$x] eq 'S' {
-            find-paths($x, $y);
-            last;
+    for @grid.keys -> $y {
+        for @grid[$y].keys -> $x {
+            if $problem == 1 and @grid[$y][$x] eq 'S' {
+                @queue.push: ($x, $y, 0);
+                last;
+            } elsif $problem == 2 and @grid[$y][$x] eq 'S'|'a' {
+                @queue.push: ($x, $y, 0);
+            }
         }
     }
-}
 
-say @paths.min;
+    find-paths;
+
+    say @paths.min;
+}
