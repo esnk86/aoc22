@@ -1,9 +1,7 @@
-my @paths;
-my @grid;
-my @queue;
-my %hist;
+my @grid = lines.map(*.comb.List).List;
 my @dirs = (-1, 0), (1, 0), (0, -1), (0, 1);
 my $alpha = ('a'..'z').join;
+my %hist;
 
 sub height-of($x, $y) {
     given @grid[$y][$x] {
@@ -28,7 +26,10 @@ sub options($x, $y, $steps) {
         .List;
 }
 
-sub find-paths() {
+sub find-shortest-path(@queue) {
+    my @paths;
+
+    %hist = ();
     %hist{.[0]}{.[1]} = 1 for @queue;
 
     while @queue {
@@ -42,23 +43,20 @@ sub find-paths() {
             @queue.push: |@options;
         }
     }
+
+    return @paths.min;
 }
 
-sub MAIN($problem where $problem (elem) <1 2>) {
-    @grid = lines.map(*.comb.List).List;
+my (@q1, @q2);
 
-    for @grid.keys -> $y {
-        for @grid[$y].keys -> $x {
-            if $problem == 1 and @grid[$y][$x] eq 'S' {
-                @queue.push: ($x, $y, 0);
-                last;
-            } elsif $problem == 2 and @grid[$y][$x] eq 'S'|'a' {
-                @queue.push: ($x, $y, 0);
-            }
+for @grid.keys -> $y {
+    for @grid[$y].keys -> $x {
+        if height-of($x, $y) == 0 {
+            @q1.push: ($x, $y, 0) if @grid[$y][$x] eq 'S';
+            @q2.push: ($x, $y, 0);
         }
     }
-
-    find-paths;
-
-    say @paths.min;
 }
+
+say find-shortest-path @q1;
+say find-shortest-path @q2;
