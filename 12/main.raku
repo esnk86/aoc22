@@ -5,19 +5,16 @@ my @dirs = (-1, 0), (1, 0), (0, -1), (0, 1);
 my $alpha = ('a'..'z').join;
 
 sub height-of($x, $y) {
-    my $c = @grid[$y][$x];
-    if $c eq 'S' {
-        return 0;
-    } elsif $c eq 'E' {
-        return 25;
-    } else {
-        return $alpha.index: $c;
+    given @grid[$y][$x] {
+        return 0 when 'S';
+        return 25 when 'E';
+        default { return $alpha.index: $_ }
     }
 }
 
 sub can-move($x1, $y1, $x2, $y2) {
     return [&&]
-        !defined(%hist{$x2}{$y2}),
+        not %hist{$x2}{$y2}:exists,
         $y2 (elem) @grid.keys,
         $x2 (elem) @grid[$y2].keys,
         height-of($x2, $y2) - height-of($x1, $y1) <= 1;
