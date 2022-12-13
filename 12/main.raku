@@ -28,13 +28,11 @@ sub options($x, $y, $steps) {
 
 sub find-shortest-path(@queue) {
     my @paths;
-
     %hist = ();
     %hist{.[0]}{.[1]} = 1 for @queue;
 
     while @queue {
         my ($x, $y, $steps) = @queue.shift;
-
         if @grid[$y][$x] eq 'E' {
             @paths.push: $steps;
         } else {
