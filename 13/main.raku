@@ -21,9 +21,7 @@ my @packets = lines.grep(*.chars > 0).map(*.EVAL).List;
 my @div = [[2]], [[6]];
 
 say sum gather for @packets.rotor(2).kv -> $i, ($a, $b) {
-    if correct-order($a, $b) ~~ Less {
-        take $i.succ;
-    }
+    take $i.succ if correct-order($a, $b) ~~ Less;
 }
 
 @packets.push: |@div;
