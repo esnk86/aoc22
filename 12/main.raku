@@ -27,7 +27,7 @@ sub options($x, $y, $steps) {
         .List;
 }
 
-sub find-path($x is copy, $y is copy) {
+sub find-paths($x is copy, $y is copy) {
     my $steps;
     my @queue;
 
@@ -52,7 +52,7 @@ sub find-path($x is copy, $y is copy) {
 for @grid.keys -> $y {
     for @grid[$y].keys -> $x {
         if @grid[$y][$x] eq 'S' {
-            find-path($x, $y);
+            find-paths($x, $y);
             last;
         }
     }
