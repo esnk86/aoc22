@@ -29,14 +29,10 @@ sub options($x, $y, $steps) {
 }
 
 sub find-paths() {
-    my $steps;
-    my $x;
-    my $y;
-
     %hist{.[0]}{.[1]} = 1 for @queue;
 
     while @queue {
-        ($x, $y, $steps) = @queue.shift;
+        my ($x, $y, $steps) = @queue.shift;
 
         if @grid[$y][$x] eq 'E' {
             @paths.push: $steps;
