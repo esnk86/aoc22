@@ -34,16 +34,12 @@ for lines() -> $line {
             # Horizontal.
             my $y = $p1[1];
             my ($begin, $end) = min-max($p1[0], $p2[0]);
-            for $begin .. $end -> $x {
-                put-rock-unit $x, $y;
-            }
+            put-rock-unit $_, $y for $begin .. $end;
         } else {
             # Vertical.
             my $x = $p1[0];
             my ($begin, $end) = min-max($p1[1], $p2[1]);
-            for $begin .. $end -> $y {
-                put-rock-unit $x, $y;
-            }
+            put-rock-unit $x, $_ for $begin .. $end;
         }
     }
 }
