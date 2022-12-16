@@ -29,6 +29,8 @@ class Slice {
 
     method simulate() {
         $!answer++ until self!put-sand-unit;
+        $!answer++;
+        self.show;
         say $!answer;
     }
 
@@ -56,12 +58,12 @@ class Slice {
     }
 
     method !put-rock-unit($x, $y) {
-        $!bottom = max $!bottom, $y.pred;
-        %!slice{$y.pred}{$x.pred} = '#';
+        $!bottom = max $!bottom, $y;
+        %!slice{$y}{$x} = '#';
     }
 
     method !put-sand-unit() {
-        my ($x1, $y1) = 499, 0;
+        my ($x1, $y1) = 500, 0;
 
         GRAVITY: while True {
             my @dirs =
@@ -79,7 +81,7 @@ class Slice {
             }
 
             %!slice{$y1}{$x1} = 'o';
-            return $x1 == 499 && $y1 == 0;
+            return $x1 == 500 && $y1 == 0;
         }
     }
 }
@@ -87,4 +89,3 @@ class Slice {
 my $slice = Slice.new;
 $slice.make: lines;
 $slice.simulate;
-$slice.show;
