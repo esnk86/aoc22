@@ -1,36 +1,13 @@
 class Slice {
     has @!slice;
-
-    method !min-max($a, $b) {
-        return min($a, $b), max($a, $b);
-    }
-
-    method !put-rock-unit($x, $y) {
-        @!slice[$_] //= ['.'] for 0 .. $y.pred;
-        @!slice[$y.pred][$_] //= '.' for 0 .. $x.pred;
-        @!slice[$y.pred][$x.pred] = '#';
-    }
-
-    method show() {
-        my @lines;
-        my $min = Inf;
-        my $max = 0;
-
-        @lines.push: .join for @!slice;
-
-        for @lines { $max = max($max, .chars) }
-        for @lines { $_ ~= '.' until .chars == $max }
-        for @lines { $min = min($min, m/^ '.' */.chars) }
-        for @lines { s/^ '.' ** {$min}// }
-        for @lines { say $++, " $_" }
-    }
+    has $!bottom = 0;
+    has $!answer = 0;
 
     method make(@lines) {
         for @lines {
             my @points = .split(' -> ').map(*.split(',').map: +*);
 
-            for @points.keys -> $i {
-                next if $i == 0;
+            for @points.keys.tail(* - 1) -> $i {
                 my ($p1, $p2) = @points[$i.pred], @points[$i];
 
                 if $p1[0] != $p2[0] {
@@ -44,9 +21,65 @@ class Slice {
                 }
             }
         }
+
+        my $max = @!slice>>.elems.max;
+
+        for @!slice { .push: ' ' until .elems == $max }
+    }
+
+    method simulate() {
+        $!answer++ while self!put-sand-unit;
+        say $!answer;
+    }
+
+    method show() {
+        my @lines;
+        my $min = Inf;
+
+        @lines.push: .join for @!slice;
+
+        for @lines { $min = min($min, m/^ ' ' */.chars) }
+        for @lines { s/^ ' ' ** {$min}// }
+        for @lines { .say }
+    }
+
+    method !min-max($a, $b) {
+        return min($a, $b), max($a, $b);
+    }
+
+    method !put-rock-unit($x, $y) {
+        $!bottom = max $!bottom, $y.pred;
+        @!slice[$_] //= [' '] for 0 .. $y.pred;
+        @!slice[$y.pred][$_] //= ' ' for 0 .. $x.pred;
+        @!slice[$y.pred][$x.pred] = '#';
+    }
+
+    method !put-sand-unit() {
+        my ($x1, $y1) = 499, 0;
+
+        GRAVITY: while True {
+            return False if $y1 >= $!bottom;
+
+            my @dirs =
+                ($x1,      $y1.succ),
+                ($x1.pred, $y1.succ),
+                ($x1.succ, $y1.succ);
+
+            for @dirs {
+                my ($x2, $y2) = @$_;
+                if @!slice[$y2][$x2] eq ' ' {
+                    ($x1, $y1) = ($x2, $y2);
+                    next GRAVITY;
+                }
+            }
+
+            @!slice[$y1][$x1] = 'o';
+            return True;
+        }
     }
 }
 
 my $slice = Slice.new;
 $slice.make: lines;
-$slice.show;
+$slice.simulate;
+#$slice.show;
