@@ -1,7 +1,69 @@
 class Slice {
-    has @!slice;
+    has %!slice;
     has $!bottom = 0;
-    has $!answer = 0;
+    has $.problem is required;
+
+    method !floor() {
+        return $!bottom + 2;
+    }
+
+    method !min-max($a, $b) {
+        return min($a, $b), max($a, $b);
+    }
+
+    method !put-rock-unit($x, $y) {
+        $!bottom = max $!bottom, $y;
+        %!slice{$y}{$x} = '#';
+    }
+
+    method simulate() {
+        my $answer = 0;
+
+        $answer++ until self!put-sand-unit;
+        $answer++ unless $!problem == 1;
+
+        self.show;
+        say $answer;
+    }
+
+    method !put-sand-unit() {
+        my ($x1, $y1) = 500, 0;
+
+        GRAVITY: while True {
+            return True if $!problem == 1 and $y1 >= $!bottom;
+            my $y2 = $y1.succ;
+
+            for $x1, $x1.pred, $x1.succ -> $x2 {
+                if (%!slice{$y2}{$x2} // ' ') eq ' ' {
+                    ($x1, $y1) = ($x2, $y2);
+                    last if $y1.succ == self!floor;
+                    next GRAVITY;
+                }
+            }
+
+            %!slice{$y1}{$x1} = 'o';
+            return $x1 == 500 && $y1 == 0;
+        }
+    }
+
+    method show() {
+        my @lines;
+        my $min-la = Inf;
+        my $max-y;
+        my $max-x;
+
+        $max-y = %!slice.keys.max;
+        $max-x = %!slice.values.map(*.max).max.key;
+
+        @lines = gather for 0 .. $max-y -> $y {
+            take (0..$max-x).map({ %!slice{$y}{$_} // ' ' }).join;
+        }
+        @lines.=List;
+
+        for @lines { $min-la = min($min-la, m/^ ' ' */.chars) }
+        for @lines { s/^ ' ' ** {$min-la}// }
+        for @lines { .say }
+    }
 
     method make(@lines) {
         for @lines {
@@ -21,65 +83,12 @@ class Slice {
                 }
             }
         }
-
-        my $max = @!slice>>.elems.max;
-
-        for @!slice { .push: ' ' until .elems == $max }
-    }
-
-    method simulate() {
-        $!answer++ while self!put-sand-unit;
-        say $!answer;
-    }
-
-    method show() {
-        my @lines;
-        my $min = Inf;
-
-        @lines.push: .join for @!slice;
-
-        for @lines { $min = min($min, m/^ ' ' */.chars) }
-        for @lines { s/^ ' ' ** {$min}// }
-        for @lines { .say }
-    }
-
-    method !min-max($a, $b) {
-        return min($a, $b), max($a, $b);
-    }
-
-    method !put-rock-unit($x, $y) {
-        $!bottom = max $!bottom, $y.pred;
-        @!slice[$_] //= [' '] for 0 .. $y.pred;
-        @!slice[$y.pred][$_] //= ' ' for 0 .. $x.pred;
-        @!slice[$y.pred][$x.pred] = '#';
-    }
-
-    method !put-sand-unit() {
-        my ($x1, $y1) = 499, 0;
-
-        GRAVITY: while True {
-            return False if $y1 >= $!bottom;
-
-            my @dirs =
-                ($x1,      $y1.succ),
-                ($x1.pred, $y1.succ),
-                ($x1.succ, $y1.succ);
-
-            for @dirs {
-                my ($x2, $y2) = @$_;
-                if @!slice[$y2][$x2] eq ' ' {
-                    ($x1, $y1) = ($x2, $y2);
-                    next GRAVITY;
-                }
-            }
-
-            @!slice[$y1][$x1] = 'o';
-            return True;
-        }
     }
 }
 
-my $slice = Slice.new;
-$slice.make: lines;
-$slice.simulate;
-#$slice.show;
+sub MAIN($problem is copy where $problem (elem) <1 2>) {
+    $problem += 0;
+    my $slice = Slice.new: :$problem;
+    $slice.make: lines;
+    $slice.simulate;
+}
