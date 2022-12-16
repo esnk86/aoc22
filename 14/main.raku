@@ -26,7 +26,7 @@ sub show-slice() {
 for lines() -> $line {
     my @points = $line.split(' -> ').map(*.split(',').map: +*);
 
-    for @points.kv -> $i, $point {
+    for @points.keys -> $i {
         next if $i == 0;
         my ($p1, $p2) = @points[$i.pred], @points[$i];
 
