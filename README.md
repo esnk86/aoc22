@@ -1,4 +1,4 @@
-# aoc22
-My solutions to Advent of Code 2022 🎄️
+# aoc22 🎄️ 🦋️
+My solutions for Advent of Code 2022
 
-All solutions are written in Raku 🦋️
+All solutions are in Raku
